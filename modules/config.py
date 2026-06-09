@@ -11,11 +11,9 @@ SYNC_FILE = os.path.join(DATA_DIR, "last_sync.json")
 
 PUBMED_API_KEY = os.getenv("PUBMED_API_KEY", "")
 PUBMED_EMAIL = os.getenv("PUBMED_EMAIL", "user@example.com")
-DEEPSEEK_API_KEY = os.getenv("DEEPSEEK_API_KEY", "")
-OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "")
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
 
-DEEPSEEK_MODEL = "deepseek-chat"
-WHISPER_MODEL = "whisper-1"
+GEMINI_MODEL = "gemini-1.5-flash"
 
 SEARCH_QUERIES = [
     "gut microbiome vegan dietary fiber",

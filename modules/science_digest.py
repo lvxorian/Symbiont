@@ -1,12 +1,12 @@
 from datetime import datetime, timedelta
 from modules.database import Database
-from modules.config import DEEPSEEK_API_KEY, DEEPSEEK_MODEL
+from modules.config import GEMINI_API_KEY, GEMINI_MODEL
 
 
 def generate_digest(db: Database, ai_client=None) -> dict:
     studies = db.get_latest_studies(n=30)
     if not studies:
-        return {"digest": "Žádné nové studie k dispozici.", "count": 0}
+        return {"digest": "Zadne nove studie k dispozici.", "count": 0}
 
     recent = [s for s in studies if s.get("pub_date", "") >= (datetime.now() - timedelta(days=30)).strftime("%Y-%m-%d")]
     recent = recent[:15]
@@ -14,7 +14,7 @@ def generate_digest(db: Database, ai_client=None) -> dict:
     if not recent:
         recent = studies[:15]
 
-    if ai_client and DEEPSEEK_API_KEY:
+    if ai_client and GEMINI_API_KEY:
         digest_text = _llm_summarize(ai_client, recent)
     else:
         digest_text = _rule_summarize(recent)
@@ -35,14 +35,14 @@ def generate_digest(db: Database, ai_client=None) -> dict:
 
 def _llm_summarize(client, studies):
     prompt_lines = [
-        "Jsi vědecký asistent specializující se na mikrobiom, fermentaci a rostlinnou výživu.",
-        "Vytvoř stručný ranní souhrn (5-7 odrážek) z následujících vědeckých studií:",
-        "Zaměř se na praktické implikace pro veganskou stravu a fermentaci.",
-        "Používej laický srozumitelný jazyk. Každou odrážku začni klíčovým zjištěním.",
+        "Jsi vedecky asistent specializujici se na mikrobiom, fermentaci a rostlinnou vyzivu.",
+        "Vytvor strucny ranni souhrn (5-7 odrazek) z nasledujicich vedeckych studii:",
+        "Zamer se na prakticke implikace pro veganskou stravu a fermentaci.",
+        "Pouzivej laicky srozumitelny jazyk. Kazdou odrazku zacni klicovym zjistenim.",
         "Studie:",
     ]
     for s in studies[:10]:
-        title = s.get("title", "Neznámý titul")
+        title = s.get("title", "Neznamy titul")
         level = s.get("evidence_level", "Unknown")
         date = s.get("pub_date", "")[:10]
         prompt_lines.append(f"- [{level}] ({date}) {title}")
@@ -51,19 +51,14 @@ def _llm_summarize(client, studies):
     prompt = "\n".join(prompt_lines)
 
     try:
-        response = client.chat.completions.create(
-            model=DEEPSEEK_MODEL,
-            messages=[{"role": "user", "content": prompt}],
-            temperature=0.3,
-            max_tokens=1500,
-        )
-        return response.choices[0].message.content
+        response = client.generate_content(prompt)
+        return response.text
     except Exception as e:
-        return f"❌ Chyba při generování AI souhrnu: {e}"
+        return f"Chyba pri generovani AI souhrnu: {e}"
 
 
 def _rule_summarize(studies):
-    lines = ["📰 **Ranní vědecký digest** (automatický)", ""]
+    lines = ["Ranni vedecky digest (automaticky)", ""]
     evidence_order = {"Meta-analysis": 0, "RCT": 1, "Cohort": 2, "Case-Control": 3, "In-vitro": 4, "Animal": 5, "Unknown": 6}
 
     sorted_studies = sorted(
@@ -73,8 +68,8 @@ def _rule_summarize(studies):
 
     for s in sorted_studies:
         icon = "📊" if s.get("evidence_level") in ["Meta-analysis", "RCT"] else "📋"
-        outdated = " ⚠️ Zastaralé" if s.get("pub_date") and s["pub_date"] < (datetime.now() - timedelta(days=365 * 5)).strftime("%Y-%m-%d") else ""
-        lines.append(f"{icon} **{s.get('title', 'Bez názvu')}**{outdated}")
+        outdated = " Zastarale" if s.get("pub_date") and s["pub_date"] < (datetime.now() - timedelta(days=365 * 5)).strftime("%Y-%m-%d") else ""
+        lines.append(f"{icon} **{s.get('title', 'Bez nazvu')}**{outdated}")
         lines.append(f"   └ {s.get('authors', '')[:80]} | {s.get('journal', '')} | {s.get('pub_date', '')[:10]}")
         lines.append(f"   └ Evidence: {s.get('evidence_level', 'N/A')}")
 
