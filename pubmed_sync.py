@@ -3,8 +3,12 @@ import sys
 import time
 import json
 import logging
+import io
 from datetime import datetime
 from xml.etree import ElementTree
+
+sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8') if hasattr(sys.stdout, 'buffer') else sys.stdout
+sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding='utf-8') if hasattr(sys.stderr, 'buffer') else sys.stderr
 
 import requests
 
