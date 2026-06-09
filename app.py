@@ -10,7 +10,7 @@ import plotly.express as px
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
-from modules.config import GEMINI_API_KEY, GEMINI_MODEL
+from modules.config import GEMINI_API_KEY, GEMINI_MODEL, GEMINI_FALLBACK_MODELS
 from modules.database import Database
 from modules.voice import init_voice, render_voice_button, speak
 from modules.fermentation import (
@@ -42,13 +42,20 @@ for key in ["db", "messages", "gemini_model", "current_module", "cell_state", "c
             st.session_state.messages = []
         elif key == "gemini_model":
             st.session_state.gemini_model = None
+            st.session_state.gemini_model_name = None
             if GEMINI_API_KEY:
-                try:
-                    import google.generativeai as genai
-                    genai.configure(api_key=GEMINI_API_KEY)
-                    st.session_state.gemini_model = genai.GenerativeModel(GEMINI_MODEL)
-                except Exception:
-                    pass
+                models_to_try = [GEMINI_MODEL] + GEMINI_FALLBACK_MODELS
+                for m in models_to_try:
+                    try:
+                        import google.generativeai as genai
+                        genai.configure(api_key=GEMINI_API_KEY)
+                        model = genai.GenerativeModel(m)
+                        model.generate_content("test")
+                        st.session_state.gemini_model = model
+                        st.session_state.gemini_model_name = m
+                        break
+                    except Exception:
+                        continue
         elif key == "current_module":
             st.session_state.current_module = 0
         elif key == "cell_state":
@@ -145,7 +152,7 @@ cell_size_class = "cell-container--chat" if is_chat else ""
 status_class = f"status-label--{st.session_state.cell_state}" if st.session_state.cell_state != "idle" else ""
 
 cell_html = f"""
-<div class="cell-container {cell_size_class}">
+<div class="cell-container {cell_size_class}" onclick="SymbiontVoice.startListening()" title="Klikni a mluv na Symbionta">
     <div class="cell cell--{st.session_state.cell_state}">
         <div class="cell__membrane">
             <div class="cell__nucleus"></div>
@@ -157,6 +164,7 @@ cell_html = f"""
     </div>
 </div>
 <p class="status-label {status_class}">{st.session_state.cell_label}</p>
+<p class="status-label" style="color:#334155;font-size:0.6rem;margin-top:-0.3rem;">klikni na bunku a mluv</p>
 """
 st.markdown(cell_html, unsafe_allow_html=True)
 

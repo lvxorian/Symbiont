@@ -49,6 +49,14 @@ a:hover { color: #22C55E; }
     padding: 1rem 0 0.5rem 0;
     min-height: 200px;
     position: relative;
+    cursor: pointer;
+    transition: transform 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+}
+.cell-container:hover {
+    transform: scale(1.02);
+}
+.cell-container:active {
+    transform: scale(0.98);
 }
 
 .cell-container--chat {

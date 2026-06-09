@@ -13,7 +13,8 @@ PUBMED_API_KEY = os.getenv("PUBMED_API_KEY", "")
 PUBMED_EMAIL = os.getenv("PUBMED_EMAIL", "user@example.com")
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
 
-GEMINI_MODEL = "gemini-1.5-flash"
+GEMINI_MODEL = "gemini-2.0-flash"
+GEMINI_FALLBACK_MODELS = ["gemini-1.5-flash", "gemini-2.0-flash-lite", "gemini-2.0-flash-exp"]
 
 SEARCH_QUERIES = [
     "gut microbiome vegan dietary fiber",
