@@ -117,32 +117,43 @@ with st.sidebar:
         st.warning("⚠️ Chybi GEMINI_API_KEY v Secrets", icon="⚠️")
 
 # ============ HEADER NAV ============
-nav_items = [
-    ("💬", "Chat"),
-    ("🧬", "F2 Ferm"),
-    ("📋", "Tracker"),
-    ("📷", "Scanner"),
-    ("🧪", "DNA"),
-    ("🌱", "Anti-N"),
-    ("📰", "Digest"),
-]
+NAV_LABELS = ["Chat", "F2 Ferm", "Tracker", "Scanner", "DNA", "Anti-N", "Digest"]
 
+SVG_ICONS = {
+    "chat": '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>',
+    "flask": '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3h6v5l4 11a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2l4-11V3"/><path d="M9 3h6"/></svg>',
+    "clipboard": '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="9" y1="9" x2="15" y2="9"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="13" y2="17"/></svg>',
+    "camera": '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>',
+    "dna": '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2c2.5 2.5 4 6 4 10s-1.5 7.5-4 10"/><path d="M12 2c-2.5 2.5-4 6-4 10s1.5 7.5 4 10"/><path d="M7 8h10"/><path d="M7 16h10"/></svg>',
+    "leaf": '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M11 20A7 7 0 0 1 9.8 6.9C15.5 4.9 17 3.5 19 2c1 2 2 4.5 2 8 0 5.5-4.78 10-10 10Z"/><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"/></svg>',
+    "book": '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/><line x1="8" y1="7" x2="16" y2="7"/><line x1="8" y1="11" x2="14" y2="11"/></svg>',
+}
+
+ICON_KEYS = ["chat", "flask", "clipboard", "camera", "dna", "leaf", "book"]
+
+st.markdown('<div class="nav-bridge">', unsafe_allow_html=True)
 nav_cols = st.columns(7)
-for i, (icon, label) in enumerate(nav_items):
+for i, label in enumerate(NAV_LABELS):
     with nav_cols[i]:
-        btn_type = "primary" if MODULE == i else "secondary"
-        if st.button(icon, key=f"nav_{i}", help=label, use_container_width=True, type=btn_type):
+        if st.button("·", key=f"nav_{i}", help=label, use_container_width=True, type="primary" if MODULE == i else "secondary"):
             st.session_state.current_module = i
             if st.session_state.cell_state in ("speaking",):
                 st.session_state.cell_state = "idle"
                 st.session_state.cell_label = "Symbiont ceka na dotaz..."
             st.rerun()
+st.markdown('</div>', unsafe_allow_html=True)
 
-nav_label_cols = st.columns(7)
-for i, (_, label) in enumerate(nav_items):
-    with nav_label_cols[i]:
-        active = " style='color:#00F2FE;font-weight:500'" if MODULE == i else ""
-        st.markdown(f"<p style='font-family:JetBrains Mono;font-size:0.6rem;color:#475569;text-align:center;margin:0;' {active}>{label}</p>", unsafe_allow_html=True)
+nav_html = '<div class="nav-dock" id="navDock">'
+for i in range(7):
+    active_class = "nav-item--active" if MODULE == i else ""
+    nav_html += f'''
+<div class="nav-item {active_class}" style="--i:{i}" onclick="var b=document.querySelector(\'button[title="{NAV_LABELS[i]}"]\');if(b)b.click()" title="{NAV_LABELS[i]}">
+    <span class="nav-icon">{SVG_ICONS[ICON_KEYS[i]]}</span>
+    <span class="nav-label">{NAV_LABELS[i]}</span>
+    <span class="nav-indicator"></span>
+</div>'''
+nav_html += '</div>'
+st.markdown(nav_html, unsafe_allow_html=True)
 
 st.markdown('<div class="divider-glow"></div>', unsafe_allow_html=True)
 
@@ -152,7 +163,7 @@ cell_size_class = "cell-container--chat" if is_chat else ""
 status_class = f"status-label--{st.session_state.cell_state}" if st.session_state.cell_state != "idle" else ""
 
 cell_html = f"""
-<div class="cell-container {cell_size_class}" onclick="SymbiontVoice.startListening()" title="Klikni a mluv na Symbionta">
+<div class="cell-container {cell_size_class}" onclick="SymbiontVoice.handleCellClick()" title="Klikni a mluv na Symbionta">
     <div class="cell cell--{st.session_state.cell_state}">
         <div class="cell__membrane">
             <div class="cell__nucleus"></div>

@@ -13,10 +13,41 @@ def init_voice():
         speechResult: '',
         onResult: null,
 
+        _focusChat: function() {
+            var el = document.querySelector('[data-testid="stChatInput"] input, [data-testid="stChatInput"] textarea');
+            if (el) { el.focus(); el.scrollIntoView({ behavior: 'smooth', block: 'center' }); }
+            return !!el;
+        },
+
+        _setChatInput: function(text) {
+            var input = document.querySelector('[data-testid="stChatInput"] input, [data-testid="stChatInput"] textarea');
+            if (!input) return false;
+            var setter = Object.getOwnPropertyDescriptor(
+                window.HTMLInputElement.prototype, 'value'
+            ).set || Object.getOwnPropertyDescriptor(
+                window.HTMLTextAreaElement.prototype, 'value'
+            ).set;
+            if (!setter) return false;
+            setter.call(input, text);
+            input.dispatchEvent(new Event('input', { bubbles: true }));
+            var btn = input.closest('[data-testid="stChatInput"]')?.querySelector('button');
+            if (btn) setTimeout(function() { btn.click(); }, 150);
+            return true;
+        },
+
+        handleCellClick: function() {
+            var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if (SR) {
+                window.SymbiontVoice.startListening();
+                return;
+            }
+            window.SymbiontVoice._focusChat();
+        },
+
         startListening: function() {
             var self = this;
             var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-            if (!SR) { self.speechResult = 'ERR_UNSUPPORTED'; return; }
+            if (!SR) { self.speechResult = 'ERR_UNSUPPORTED'; self._focusChat(); return; }
             if (self.listening) return;
             self.listening = true;
             var r = new SR();
@@ -27,20 +58,12 @@ def init_voice():
                 self.speechResult = e.results[0][0].transcript;
                 self.listening = false;
                 if (self.onResult) self.onResult(self.speechResult);
-                var input = document.querySelector('input[data-speech-target]');
-                if (input) {
-                    var setter = Object.getOwnPropertyDescriptor(
-                        window.HTMLInputElement.prototype, 'value'
-                    ).set;
-                    setter.call(input, self.speechResult);
-                    input.dispatchEvent(new Event('input', { bubbles: true }));
-                    var form = input.closest('form');
-                    if (form) { var btn = form.querySelector('button'); if (btn) btn.click(); }
-                }
+                self._setChatInput(self.speechResult);
             };
             r.onerror = function() {
                 self.speechResult = 'ERR_FAILED';
                 self.listening = false;
+                self._focusChat();
             };
             r.start();
         },
@@ -63,7 +86,7 @@ def init_voice():
 def render_voice_button():
     html = """
     <div style="text-align:center; padding: 0.25rem 0;">
-        <button onclick="SymbiontVoice.startListening()" style="
+        <button onclick="SymbiontVoice.handleCellClick()" style="
             background: linear-gradient(135deg, #00F2FE22, #22C55E22);
             border: 1px solid #00F2FE44;
             color: #00F2FE;
