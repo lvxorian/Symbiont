@@ -31,8 +31,6 @@ st.set_page_config(page_title="Symbiont.ai", page_icon="🧬", layout="wide", in
 with open("styles.css") as f:
     st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
 
-st.markdown('<div class="divider-glow"></div>', unsafe_allow_html=True)
-
 # --- Session state ---
 for key in ["db", "messages", "gemini_model", "current_module", "cell_state", "cell_label", "current_digest"]:
     if key not in st.session_state:
@@ -91,71 +89,52 @@ if "sync_done" not in st.session_state:
         pass
 
 # ============ SIDEBAR ============
-with st.sidebar:
-    st.markdown('<p style="font-family:JetBrains Mono; font-size:1.1rem; color:#00F2FE; text-align:center; margin:0;">🧬 Symbiont.ai</p>', unsafe_allow_html=True)
-    st.markdown('<p style="font-family:JetBrains Mono; font-size:0.65rem; color:#64748B; text-align:center;">Autonomni AI Jarvis</p>', unsafe_allow_html=True)
-    st.markdown("<hr>", unsafe_allow_html=True)
+NAV_LABELS = ["Chat", "F2 Ferm", "Tracker", "Scanner", "DNA", "Anti-N", "Digest"]
 
-    stats = db.get_stats()
-    ec = stats.get("evidence_counts", {})
-    col1, col2 = st.columns(2)
-    with col1: st.metric("Studie", stats["total_studies"])
-    with col2: st.metric("RCT/Meta", ec.get("RCT", 0) + ec.get("Meta-analysis", 0))
+def _switch_module(i):
+    st.session_state.current_module = i
+    if st.session_state.cell_state in ("speaking",):
+        st.session_state.cell_state = "idle"
+        st.session_state.cell_label = "Symbiont ceka na dotaz..."
+
+with st.sidebar:
+    st.markdown('<div class="sidebar-brand">Symbiont</div>', unsafe_allow_html=True)
+    st.markdown('<div class="sidebar-sub">Autonomni AI Jarvis</div>', unsafe_allow_html=True)
+
+    st.markdown('<div class="sidebar-divider"></div>', unsafe_allow_html=True)
+
+    current = st.radio(
+        "_nav", range(7), index=MODULE,
+        format_func=lambda i: NAV_LABELS[i],
+        key="_nav_radio", label_visibility="collapsed",
+    )
+    if current != MODULE:
+        _switch_module(current)
+        st.rerun()
+
+    st.markdown('<div class="sidebar-divider"></div>', unsafe_allow_html=True)
 
     render_voice_button()
-    st.markdown('<p style="font-family:JetBrains Mono; font-size:0.6rem; color:#475569; text-align:center;">Klikni a mluv cesky</p>', unsafe_allow_html=True)
-
-    st.markdown("<hr>", unsafe_allow_html=True)
-    st.markdown("### 🧪 Rychly F2")
-    qs = st.number_input("Cukr g/l", 20, 200, 80, label_visibility="collapsed")
-    qt = st.slider("°C", 15, 50, 28, label_visibility="collapsed")
-    if st.button("Simulovat", use_container_width=True):
-        qr = predict_ph_curve(qs, qt, 5.5, ["Lactobacillus plantarum"])
-        st.info(f"pH za 7d: {qr['final_ph']:.2f}")
+    st.markdown('<p class="sidebar-voice-label">Klikni a mluv cesky</p>', unsafe_allow_html=True)
 
     if not GEMINI_API_KEY:
         st.warning("⚠️ Chybi GEMINI_API_KEY v Secrets", icon="⚠️")
 
-# ============ HEADER NAV ============
-NAV_LABELS = ["Chat", "F2 Ferm", "Tracker", "Scanner", "DNA", "Anti-N", "Digest"]
-
-SVG_ICONS = {
-    "chat": '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>',
-    "flask": '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3h6v5l4 11a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2l4-11V3"/><path d="M9 3h6"/></svg>',
-    "clipboard": '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="9" y1="9" x2="15" y2="9"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="13" y2="17"/></svg>',
-    "camera": '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>',
-    "dna": '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2c2.5 2.5 4 6 4 10s-1.5 7.5-4 10"/><path d="M12 2c-2.5 2.5-4 6-4 10s1.5 7.5 4 10"/><path d="M7 8h10"/><path d="M7 16h10"/></svg>',
-    "leaf": '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M11 20A7 7 0 0 1 9.8 6.9C15.5 4.9 17 3.5 19 2c1 2 2 4.5 2 8 0 5.5-4.78 10-10 10Z"/><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"/></svg>',
-    "book": '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/><line x1="8" y1="7" x2="16" y2="7"/><line x1="8" y1="11" x2="14" y2="11"/></svg>',
-}
-
-ICON_KEYS = ["chat", "flask", "clipboard", "camera", "dna", "leaf", "book"]
-
-st.markdown('<div class="nav-bridge">', unsafe_allow_html=True)
-nav_cols = st.columns(7)
-for i, label in enumerate(NAV_LABELS):
-    with nav_cols[i]:
-        if st.button("·", key=f"nav_{i}", help=label, use_container_width=True, type="primary" if MODULE == i else "secondary"):
-            st.session_state.current_module = i
-            if st.session_state.cell_state in ("speaking",):
-                st.session_state.cell_state = "idle"
-                st.session_state.cell_label = "Symbiont ceka na dotaz..."
-            st.rerun()
-st.markdown('</div>', unsafe_allow_html=True)
-
-nav_html = '<div class="nav-dock" id="navDock">'
-for i in range(7):
-    active_class = "nav-item--active" if MODULE == i else ""
-    nav_html += f'''
-<div class="nav-item {active_class}" style="--i:{i}" onclick="var b=document.querySelector(\'button[title="{NAV_LABELS[i]}"]\');if(b)b.click()" title="{NAV_LABELS[i]}">
-    <span class="nav-icon">{SVG_ICONS[ICON_KEYS[i]]}</span>
-    <span class="nav-label">{NAV_LABELS[i]}</span>
-    <span class="nav-indicator"></span>
-</div>'''
-nav_html += '</div>'
-st.markdown(nav_html, unsafe_allow_html=True)
-
 st.markdown('<div class="divider-glow"></div>', unsafe_allow_html=True)
+
+# ============ STATS CARDS ============
+stat_data = db.get_stats()
+ec = stat_data.get("evidence_counts", {})
+sc1, sc2, sc3, sc4 = st.columns(4)
+with sc1:
+    st.markdown(f'<div class="stat-card"><div class="stat-value">{stat_data["total_studies"]}</div><div class="stat-label">Studii v databazi</div></div>', unsafe_allow_html=True)
+with sc2:
+    rct = ec.get("RCT", 0) + ec.get("Meta-analysis", 0)
+    st.markdown(f'<div class="stat-card"><div class="stat-value">{rct}</div><div class="stat-label">RCT / Meta-analýzy</div></div>', unsafe_allow_html=True)
+with sc3:
+    st.markdown(f'<div class="stat-card"><div class="stat-value">{stat_data.get("fermentation_logs", 0)}</div><div class="stat-label">Fermentací</div></div>', unsafe_allow_html=True)
+with sc4:
+    st.markdown(f'<div class="stat-card"><div class="stat-value">{stat_data.get("stool_logs", 0)}</div><div class="stat-label">Záznamů stolice</div></div>', unsafe_allow_html=True)
 
 # ============ CELL (always visible) ============
 is_chat = MODULE == 0
