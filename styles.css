@@ -202,11 +202,6 @@ div[data-testid="stSidebar"] div[role="radiogroup"] input {
     padding: 1.5rem 0 0.5rem 0;
 }
 
-.cell-container--empty {
-    min-height: 300px;
-    padding: 2rem 0;
-}
-
 /* ---- CELL ---- */
 .cell {
     position: relative;
@@ -218,11 +213,6 @@ div[data-testid="stSidebar"] div[role="radiogroup"] input {
 .cell--thinking {
     width: 180px;
     height: 180px;
-}
-
-.cell--small {
-    width: 100px;
-    height: 100px;
 }
 
 /* Membrane */
@@ -564,43 +554,6 @@ div[data-testid="stError"] {
 @keyframes blink {
     0%, 100% { opacity: 1; }
     50% { opacity: 0.4; }
-}
-
-/* ---- BADGES ---- */
-.badge-rct {
-    background-color: #22C55E22;
-    color: #22C55E;
-    padding: 0.1rem 0.4rem;
-    border-radius: 4px;
-    font-size: 0.65rem;
-    font-family: 'JetBrains Mono', monospace;
-    border: 1px solid #22C55E44;
-}
-
-.badge-invitro {
-    background-color: #F59E0B22;
-    color: #F59E0B;
-    padding: 0.1rem 0.4rem;
-    border-radius: 4px;
-    font-size: 0.65rem;
-    font-family: 'JetBrains Mono', monospace;
-    border: 1px solid #F59E0B44;
-}
-
-/* ---- RECORDING INDICATOR ---- */
-.recording-pulse {
-    display: inline-block;
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    background: #EF4444;
-    animation: recPulse 1s ease-in-out infinite;
-    margin-right: 6px;
-}
-
-@keyframes recPulse {
-    0%, 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.6); }
-    50% { box-shadow: 0 0 0 8px rgba(239, 68, 68, 0); }
 }
 
 /* ---- FOOTER ---- */

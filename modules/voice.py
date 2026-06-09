@@ -112,12 +112,13 @@ def render_voice_button():
 def speak(text):
     if not text:
         return
-    escaped = text.replace("\\", "\\\\").replace("'", "\\'").replace("\n", " ").replace("<", "").replace(">", "").replace("&", "&amp;")
+    import json
+    safe = json.dumps(text)
     js = f"""
     <script>
     (function() {{
         if (window.SymbiontVoice) {{
-            setTimeout(function() {{ window.SymbiontVoice.speak('{escaped}'); }}, 200);
+            setTimeout(function() {{ window.SymbiontVoice.speak({safe}); }}, 200);
         }}
     }})();
     </script>

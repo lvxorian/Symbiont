@@ -2,6 +2,9 @@ import pandas as pd
 import numpy as np
 from datetime import datetime
 
+import streamlit as st
+import plotly.express as px
+
 BRISTOL_DESCRIPTIONS = {
     1: "Oddělené tvrdé kuličky (těžká zácpa)",
     2: "Hrudkovitá klobása (mírná zácpa)",
@@ -96,3 +99,43 @@ def _calculate_trend(values):
 
 def get_bristol_description(score):
     return BRISTOL_DESCRIPTIONS.get(score, "Neznámá hodnota")
+
+
+def render_stool_tracker(db):
+    st.markdown("### Stool & Symptom Tracker")
+    st.caption("Bristol, priznaky, korelace se stravou a probiotiky")
+    col1, col2 = st.columns([1, 1])
+    with col1:
+        ed = st.date_input("Datum", datetime.now())
+        bs = st.select_slider("Bristol", list(range(1, 8)), 4, format_func=lambda x: f"{x} - {get_bristol_description(x).split(' (')[0]}")
+        st.caption(get_bristol_description(bs))
+        sym = st.multiselect("Priznaky", SYMPTOM_OPTIONS)
+        fd = st.multiselect("Jidlo", FOOD_CATEGORIES)
+        pb = st.multiselect("Probiotika", PROBIOTIC_OPTIONS)
+        nt = st.text_area("Poznamky", max_chars=300)
+        if st.button("Ulozit", use_container_width=True):
+            db.add_stool_log(ed.isoformat(), bs, ", ".join(sym) or "zadne", ", ".join(fd) or "neuvedeno", ", ".join(pb) or "zadna", nt or "-")
+            st.success("Ulozeno")
+    with col2:
+        logs = db.get_stool_logs(100)
+        if logs:
+            a = analyze_correlations(logs)
+            if a:
+                m1, m2, m3 = st.columns(3)
+                m1.metric("Prumer", f"{a['avg_bristol']:.1f}"); m2.metric("Rozptyl", f"{a['std_bristol']:.2f}"); m3.metric("Trend", a["trend"])
+                if a["daily_data"]:
+                    df = pd.DataFrame(a["daily_data"])
+                    fig = px.line(df, x="date", y="bristol", markers=True)
+                    fig.add_hline(y=4, line_dash="dash", line_color="#22C55E")
+                    fig.update_layout(template="plotly_dark", paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)", height=250)
+                    st.plotly_chart(fig, use_container_width=True)
+                if a.get("symptom_frequency"):
+                    st.markdown("#### Příznaky")
+                    for sym, count in list(a["symptom_frequency"].items())[:5]:
+                        st.markdown(f"- {sym}: **{count}x**")
+                if a.get("food_frequency"):
+                    st.markdown("#### Nejčastější jídla")
+                    for item, count in list(a["food_frequency"].items())[:5]:
+                        st.markdown(f"- {item}: **{count}x**")
+            else:
+                st.warning("Potreba 3+ zaznamu pro analyzu")

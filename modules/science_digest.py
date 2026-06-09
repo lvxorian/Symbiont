@@ -1,6 +1,9 @@
 from datetime import datetime, timedelta
 from modules.database import Database
 from modules.config import GEMINI_API_KEY, GEMINI_MODEL
+import streamlit as st
+import pandas as pd
+import plotly.express as px
 
 
 def generate_digest(db: Database, ai_client=None) -> dict:
@@ -74,3 +77,36 @@ def _rule_summarize(studies):
         lines.append(f"   └ Evidence: {s.get('evidence_level', 'N/A')}")
 
     return "\n".join(lines)
+
+
+def render_digest(db):
+    from pubmed_sync import sync_if_needed
+
+    st.markdown("### Morning Science Digest")
+    st.caption("Ranni souhrn nejnovejsich studii")
+    col1, col2 = st.columns([1, 3])
+    with col1:
+        st.metric("Studii", db.get_stats()["total_studies"])
+        if st.button("Generovat digest", use_container_width=True):
+            with st.spinner("Generuji..."):
+                st.session_state.current_digest = generate_digest(db, ai_client=st.session_state.get("gemini_model"))
+        if st.button("Sync PubMed", use_container_width=True):
+            with st.spinner("Stahuji studie..."):
+                a = sync_if_needed(db, force=True)
+                st.success(f"Pridano {a} studii") if a else st.info("Zadne nove")
+    with col2:
+        if "current_digest" in st.session_state:
+            d = st.session_state.current_digest
+            st.markdown(f"<div class='sci-fi-card'>{d['digest']}</div>", unsafe_allow_html=True)
+            if d.get("evidence_breakdown"):
+                df = pd.DataFrame(list(d["evidence_breakdown"].items()), columns=["Level","Count"])
+                fig = px.pie(df, values="Count", names="Level", color_discrete_sequence=["#22C55E","#00F2FE","#F59E0B","#EF4444"])
+                fig.update_layout(template="plotly_dark", paper_bgcolor="rgba(0,0,0,0)", height=250)
+                st.plotly_chart(fig, use_container_width=True)
+            with st.expander("Studie"):
+                for s in d["studies"]:
+                    badge = "📊" if s.get("evidence_level") in ("RCT","Meta-analysis") else "📋"
+                    st.markdown(f"{badge} **{s.get('title','')}**")
+                    st.caption(f"{s.get('authors','')[:60]} | {s.get('journal','')} | {s.get('pub_date','')[:10]}")
+        else:
+            st.info("Klikni na Generovat digest")

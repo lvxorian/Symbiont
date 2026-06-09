@@ -166,6 +166,47 @@ def get_all_foods():
     return list(FOOD_DB.keys())
 
 
+def render_antinutrient():
+    import streamlit as st
+
+    st.markdown("### Antinutrient Deactivator")
+    st.caption("Pruvodce deaktivaci fytatu, lektinu, oxalatu")
+    col1, col2 = st.columns([1, 1.5])
+    with col1:
+        q = st.text_input("Hledat", placeholder="cocka, mandle, quinoa...")
+        sel = None
+        if q:
+            m = search_food(q)
+            if m: sel = st.selectbox("Vyber", m)
+            else: st.warning("Nenalezeno")
+        else:
+            sel = st.selectbox("Nebo ze seznamu", [""]+get_all_foods())
+            if sel == "": sel = None
+    with col2:
+        if sel:
+            info = get_food_info(sel)
+            if info:
+                st.markdown(f"**{sel}**")
+                ants = info["antinutrients"]
+                st.markdown("Antinutrienty:")
+                cols = st.columns(len(ants))
+                for i, a in enumerate(ants):
+                    with cols[i]: st.markdown(f"<div class='sci-fi-card' style='text-align:center;padding:0.4rem;'><span style='color:#EF4444;'>⚠️</span><br><span style='font-size:0.75rem;'>{a}</span></div>", unsafe_allow_html=True)
+                d = info["deactivation"]
+                st.markdown(f"**Metoda:** {d.get('metoda','')}")
+                pc = st.columns(3)
+                if "namaceni_hodiny" in d: pc[0].metric("Namaceni", f"{d['namaceni_hodiny']}h")
+                if "vareni_minuty" in d: pc[1].metric("Vareni", f"{d['vareni_minuty']}m")
+                if "tlakovy_hrnec_min" in d: pc[2].metric("Tlak", f"{d['tlakovy_hrnec_min']}m")
+                if d.get("voda_vymenit"): st.info("💧 Slit vodu!")
+                if "poznamka" in d: st.warning(d["poznamka"])
+    st.markdown("<div class='divider-glow'></div>", unsafe_allow_html=True)
+    st.markdown("#### Tipy")
+    tc = st.columns(2)
+    for i, tip in enumerate(GENERAL_TIPS):
+        with tc[i%2]: st.markdown(f"<div class='sci-fi-card' style='padding:0.5rem;font-size:0.85rem;'>{tip}</div>", unsafe_allow_html=True)
+
+
 def search_food(query):
     query = query.lower()
     return [name for name in FOOD_DB if query in name.lower()]

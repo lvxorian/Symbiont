@@ -29,13 +29,6 @@ class Database:
             )
         """)
         conn.execute("""
-            CREATE TABLE IF NOT EXISTS stool_results (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                stool_log_id INTEGER, result_type TEXT, result_data TEXT,
-                FOREIGN KEY(stool_log_id) REFERENCES stool_logs(id)
-            )
-        """)
-        conn.execute("""
             CREATE TABLE IF NOT EXISTS fermentation_logs (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 date TEXT, sugar REAL, temperature REAL,
