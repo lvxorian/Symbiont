@@ -1,0 +1,370 @@
+/* ========================================== */
+/*  Symbiont.ai - Bio-Tech Dark Theme        */
+/*  #0E1117 (slate black)                    */
+/*  #1E293B (components)                     */
+/*  #00F2FE (neon cyan - bioluminiscence)    */
+/*  #22C55E (neon green)                     */
+/* ========================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&family=Inter:wght@300;400;500;600;700&display=swap');
+
+/* ---- GLOBAL ---- */
+.stApp {
+    background-color: #0E1117;
+    color: #E2E8F0;
+    font-family: 'Inter', -apple-system, sans-serif;
+}
+
+.stApp > header {
+    background-color: #0E1117 !important;
+}
+
+h1, h2, h3 {
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 500;
+    color: #F1F5F9;
+    letter-spacing: -0.02em;
+}
+
+h1 {
+    background: linear-gradient(135deg, #00F2FE 0%, #22C55E 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    font-weight: 700;
+}
+
+h2 {
+    border-bottom: 1px solid #1E293B;
+    padding-bottom: 0.5rem;
+    margin-top: 1.5rem;
+}
+
+/* ---- CARDS & CONTAINERS ---- */
+.stBlock, div[data-testid="stVerticalBlock"] > div {
+    background-color: transparent;
+}
+
+div[data-testid="stExpander"] {
+    background-color: #1E293B;
+    border: 1px solid #334155;
+    border-radius: 12px;
+    padding: 0.5rem;
+}
+
+div[data-testid="stExpander"] > div[role="button"] p {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.9rem;
+    color: #00F2FE;
+}
+
+/* ---- SIDEBAR ---- */
+section[data-testid="stSidebar"] {
+    background-color: #0F172A;
+    border-right: 1px solid #1E293B;
+}
+
+section[data-testid="stSidebar"] .stBlock {
+    background-color: transparent;
+}
+
+section[data-testid="stSidebar"] hr {
+    border-color: #1E293B;
+    margin: 1rem 0;
+}
+
+/* ---- METRICS ---- */
+div[data-testid="stMetric"] {
+    background-color: #1E293B;
+    border: 1px solid #334155;
+    border-radius: 8px;
+    padding: 0.75rem;
+}
+
+div[data-testid="stMetric"] > div[data-testid="stMetricLabel"] {
+    color: #94A3B8;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+div[data-testid="stMetric"] > div[data-testid="stMetricValue"] {
+    color: #00F2FE;
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 700;
+    font-size: 1.5rem;
+}
+
+/* ---- BUTTONS ---- */
+.stButton > button {
+    background: linear-gradient(135deg, #00F2FE22, #22C55E22);
+    border: 1px solid #00F2FE44;
+    color: #00F2FE;
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 500;
+    border-radius: 8px;
+    padding: 0.5rem 1.25rem;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(4px);
+}
+
+.stButton > button:hover {
+    background: linear-gradient(135deg, #00F2FE44, #22C55E44);
+    border: 1px solid #00F2FE88;
+    box-shadow: 0 0 20px #00F2FE33, 0 0 40px #22C55E22;
+    transform: translateY(-1px);
+}
+
+.stButton > button:active {
+    transform: translateY(0);
+}
+
+/* ---- TEXT INPUTS ---- */
+.stTextInput > div > div > input,
+.stTextArea > div > div > textarea {
+    background-color: #1E293B !important;
+    border: 1px solid #334155 !important;
+    color: #E2E8F0 !important;
+    border-radius: 8px !important;
+    font-family: 'Inter', sans-serif;
+}
+
+.stTextInput > div > div > input:focus,
+.stTextArea > div > div > textarea:focus {
+    border-color: #00F2FE !important;
+    box-shadow: 0 0 0 1px #00F2FE44 !important;
+}
+
+/* ---- SELECT BOX ---- */
+div[data-testid="stSelectbox"] > div > div {
+    background-color: #1E293B;
+    border: 1px solid #334155;
+    border-radius: 8px;
+    color: #E2E8F0;
+}
+
+div[data-testid="stSelectbox"] > div > div:focus {
+    border-color: #00F2FE;
+}
+
+/* ---- SLIDER ---- */
+div[data-testid="stSlider"] > div > div > div {
+    background-color: #1E293B;
+}
+
+div[data-testid="stSlider"] > div > div > div > div {
+    background: linear-gradient(90deg, #00F2FE, #22C55E);
+}
+
+/* ---- TABS ---- */
+div[data-testid="stTabs"] {
+    background-color: transparent;
+}
+
+div[data-testid="stTabs"] > div > button {
+    background-color: transparent;
+    color: #94A3B8;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.8rem;
+    border: none;
+    border-bottom: 2px solid transparent;
+    padding: 0.5rem 1rem;
+    transition: all 0.2s ease;
+}
+
+div[data-testid="stTabs"] > div > button:hover {
+    color: #00F2FE;
+    border-bottom-color: #00F2FE44;
+}
+
+div[data-testid="stTabs"] > div > button[aria-selected="true"] {
+    color: #00F2FE;
+    border-bottom-color: #00F2FE;
+}
+
+/* ---- DATAFRAME ---- */
+div[data-testid="stDataFrame"] {
+    background-color: #1E293B;
+    border: 1px solid #334155;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+div[data-testid="stDataFrame"] th {
+    background-color: #0F172A !important;
+    color: #00F2FE !important;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+div[data-testid="stDataFrame"] td {
+    background-color: #1E293B !important;
+    color: #E2E8F0 !important;
+    border-bottom: 1px solid #334155;
+}
+
+/* ---- CHAT MESSAGES ---- */
+div[data-testid="stChatMessage"] {
+    background-color: #1E293B;
+    border: 1px solid #334155;
+    border-radius: 12px;
+    padding: 0.75rem;
+    margin: 0.5rem 0;
+}
+
+div[data-testid="stChatMessage"][aria-label="user"] {
+    border-color: #00F2FE44;
+}
+
+div[data-testid="stChatMessage"][aria-label="assistant"] {
+    border-color: #22C55E44;
+}
+
+/* ---- INFO / SUCCESS / WARNING ---- */
+div[data-testid="stInfo"] {
+    background-color: #1E293B;
+    border: 1px solid #00F2FE44;
+    border-left: 4px solid #00F2FE;
+}
+
+div[data-testid="stSuccess"] {
+    background-color: #1E293B;
+    border: 1px solid #22C55E44;
+    border-left: 4px solid #22C55E;
+}
+
+div[data-testid="stWarning"] {
+    background-color: #1E293B;
+    border: 1px solid #F59E0B44;
+    border-left: 4px solid #F59E0B;
+}
+
+div[data-testid="stError"] {
+    background-color: #1E293B;
+    border: 1px solid #EF444444;
+    border-left: 4px solid #EF4444;
+}
+
+/* ---- AUDIO INPUT (Voice) ---- */
+div[data-testid="stAudioInput"] > div {
+    background-color: #1E293B;
+    border: 2px dashed #00F2FE44;
+    border-radius: 16px;
+    padding: 1rem;
+}
+
+div[data-testid="stAudioInput"] > div:hover {
+    border-color: #00F2FE88;
+    box-shadow: 0 0 30px #00F2FE22;
+}
+
+/* ---- SPINNER ---- */
+div[role="status"] {
+    color: #00F2FE;
+}
+
+/* ---- FILE UPLOADER ---- */
+div[data-testid="stFileUploader"] {
+    background-color: #1E293B;
+    border: 2px dashed #334155;
+    border-radius: 12px;
+    padding: 1rem;
+}
+
+div[data-testid="stFileUploader"]:hover {
+    border-color: #00F2FE44;
+}
+
+/* ---- SCROLLBAR ---- */
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: #0E1117;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #1E293B;
+    border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #334155;
+}
+
+/* ---- CUSTOM CLASSES ---- */
+.glow-text {
+    color: #00F2FE;
+    text-shadow: 0 0 10px #00F2FE44, 0 0 20px #00F2FE22;
+}
+
+.green-glow {
+    color: #22C55E;
+    text-shadow: 0 0 10px #22C55E44;
+}
+
+.sci-fi-card {
+    background: linear-gradient(135deg, #1E293B 0%, #0F172A 100%);
+    border: 1px solid #334155;
+    border-radius: 12px;
+    padding: 1.25rem;
+    margin: 0.75rem 0;
+    backdrop-filter: blur(8px);
+}
+
+.sci-fi-card:hover {
+    border-color: #00F2FE44;
+    box-shadow: 0 4px 20px rgba(0, 242, 254, 0.08);
+}
+
+.divider-glow {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, #00F2FE, #22C55E, transparent);
+    margin: 1.5rem 0;
+}
+
+.badge-rct {
+    background-color: #22C55E22;
+    color: #22C55E;
+    padding: 0.15rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.7rem;
+    font-family: 'JetBrains Mono', monospace;
+    border: 1px solid #22C55E44;
+}
+
+.badge-invitro {
+    background-color: #F59E0B22;
+    color: #F59E0B;
+    padding: 0.15rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.7rem;
+    font-family: 'JetBrains Mono', monospace;
+    border: 1px solid #F59E0B44;
+}
+
+.badge-outdated {
+    background-color: #EF444422;
+    color: #EF4444;
+    padding: 0.15rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.7rem;
+    font-family: 'JetBrains Mono', monospace;
+    border: 1px solid #EF444444;
+}
+
+.dna-helix-bg {
+    background: linear-gradient(180deg, transparent 0%, #0E1117 100%);
+    position: relative;
+}
+
+/* ---- RESPONSIVE ---- */
+@media (max-width: 768px) {
+    h1 { font-size: 1.5rem; }
+    div[data-testid="stTabs"] > div > button { font-size: 0.7rem; padding: 0.3rem 0.5rem; }
+}

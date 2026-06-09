@@ -1,0 +1,9 @@
+.env
+__pycache__/
+*.pyc
+data/chromadb/
+data/symbiont.db
+data/last_sync.json
+*.egg-info/
+dist/
+build/
